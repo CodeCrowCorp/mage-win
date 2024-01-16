@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MageWin (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MageWin (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
