@@ -34,7 +34,14 @@
     package has not yet been restored.
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix"/>
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\workflows\ci-dev.yml" />
+    <None Include=".github\workflows\ci-prod.yml" />
   </ItemGroup>
 
   <!-- 
