@@ -37,6 +37,9 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  <ItemGroup>
+    <None Include=".github\workflows\ci-dev.yml" />
+    <None Include=".github\workflows\ci-prod.yml" />
   </ItemGroup>
 
   <!-- 
