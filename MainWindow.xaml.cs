@@ -1,4 +1,7 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Diagnostics;
@@ -20,7 +23,7 @@ namespace MageWin
         public MainWindow()
         {
             this.InitializeComponent();
-            this.AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 800, 800));
+            this.AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 300, 600));
         }
 
         private void WebSocket_Closed(Windows.Networking.Sockets.IWebSocket sender, Windows.Networking.Sockets.WebSocketClosedEventArgs args)
@@ -46,7 +49,7 @@ namespace MageWin
         }
 
 
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             ChannlePopUp.IsOpen = true;
         }
@@ -110,14 +113,14 @@ namespace MageWin
         }
         private void Grid_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            if (TopAppBar.Visibility == Visibility.Visible)
-            {
-                TopAppBar.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                TopAppBar.Visibility = Visibility.Visible;
-            }
+            //if (TopAppBar.Visibility == Visibility.Visible)
+            //{
+            //    TopAppBar.Visibility = Visibility.Collapsed;
+            //}
+            //else
+            //{
+            //    TopAppBar.Visibility = Visibility.Visible;
+            //}
         }
     }
 }
