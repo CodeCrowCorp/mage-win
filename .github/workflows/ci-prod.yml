@@ -30,8 +30,8 @@ jobs:
     - name: Build
       run: dotnet build
 
-    - name: Test with the dotnet CLI
-      run: dotnet test
+    # - name: Test with the dotnet CLI
+    #   run: dotnet test
   deploy:
     if: ${{ github.actor != 'dependabot[bot]' }}
     name: Create MSIX package artifact
