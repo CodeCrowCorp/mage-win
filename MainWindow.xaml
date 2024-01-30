@@ -14,7 +14,8 @@
         Background="Transparent"
         Loaded="Grid_Loaded"
         PointerEntered="Grid_PointerEntered"
-        PointerExited="Grid_PointerExited">
+        PointerExited="Grid_PointerExited"
+        Tapped="Grid_Tapped">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*" />
             <RowDefinition />

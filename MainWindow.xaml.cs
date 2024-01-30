@@ -4,20 +4,12 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,6 +30,7 @@ namespace MageWin
             GetAppWindowAndPresenter();
             _apw.IsShownInSwitchers = false;
             _presenter.SetBorderAndTitleBar(true, true);
+            _presenter.IsMaximizable=false;
 
         }
         public SolidColorBrush GetSolidColorBrush(string hex)
@@ -69,24 +62,31 @@ namespace MageWin
                         if (IsValidJson(message))
                         {
                             var json = JsonConvert.DeserializeObject<MessageData>(message);
-                            StackPanel mainStack = new StackPanel() { Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(10, 10, 0, 0) };
-                            mainStack.PointerEntered += MainStack_PointerEntered;
-                            mainStack.PointerExited += MainStack_PointerExited;
-                            Border brd = new Border() { Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.DodgerBlue), CornerRadius = new CornerRadius(5), Padding = new Thickness(10, 0, 10, 0) };
-
-                            TextBlock msgText = new TextBlock() { Text = json.message, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), HorizontalAlignment = HorizontalAlignment.Center };
-                            brd.Child = msgText;
-                            if (json.user != null)
+                            if (json != null&&json.message!=null)
                             {
-                                long unixDate = json.timestamp;
-                                DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                                DateTime date = start.AddMilliseconds(unixDate).ToLocalTime();
-                                TextBlock userText = new TextBlock() { Text = json.user.username, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Black) };
-                                TextBlock timeText = new TextBlock() { Text = date.ToString(), Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Black), FontSize = 8 };
-                                mainStack.Children.Add(userText);
-                                mainStack.Children.Add(brd);
-                                mainStack.Children.Add(timeText);
-                                ChatStack.Children.Add(mainStack);
+                                if (json.user != null && json.user?.userId != null&&json.user.userId!=0)
+                                {
+                                    StackPanel mainStack = new StackPanel() { Orientation=Orientation.Horizontal, Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(10, 10, 0, 0) };
+                                    mainStack.PointerEntered += MainStack_PointerEntered;
+                                    mainStack.PointerExited += MainStack_PointerExited;
+                                    //Border brd = new Border() { Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), CornerRadius = new CornerRadius(5), Padding = new Thickness(10, 0, 10, 0) };
+
+                                    TextBlock msgText = new TextBlock() {FontSize=20, Margin = new Thickness(20, 0, 0, 0), Text = json.message, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), HorizontalAlignment = HorizontalAlignment.Center };
+                                    //brd.Child = msgText;
+                                    if (json.user != null)
+                                    {
+                                        //long unixDate = json.timestamp;
+                                        DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                                        //DateTime date = start.AddMilliseconds(unixDate).ToLocalTime();
+                                        TextBlock userText = new TextBlock() {FontSize=22, Text = json.user.username, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White) };
+                                        //TextBlock timeText = new TextBlock() { Text = date.ToString(), Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Black), FontSize = 8 };
+                                        mainStack.Children.Add(userText);
+                                        mainStack.Children.Add(msgText);
+                                        //mainStack.Children.Add(brd);
+                                        //mainStack.Children.Add(timeText);
+                                        ChatStack.Children.Add(mainStack);
+                                    }
+                                }
                             }
                         }
                     });
@@ -167,6 +167,7 @@ namespace MageWin
                     MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
                     FileMenu.Visibility = Visibility.Collapsed;
                     _presenter.SetBorderAndTitleBar(false, false);
+                    _presenter.IsResizable = false;
                     Task connectTask = webSocket.ConnectAsync(new Uri("wss://api.mage.stream/wsinit/channelid/" + res + "/connect")).AsTask();
                     IsConnected = true;
                     var data = new
@@ -242,7 +243,7 @@ namespace MageWin
             {
                 var color = GetSolidColorBrush("#554444ff").Color;
                 //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.White };
-                FileMenu.Visibility = Visibility.Visible;
+                //FileMenu.Visibility = Visibility.Visible;
                 // _presenter.SetBorderAndTitleBar(true, true);
             }
         }
@@ -254,6 +255,10 @@ namespace MageWin
             WindowId myWndId = Win32Interop.GetWindowIdFromWindow(hWnd);
             _apw = AppWindow.GetFromWindowId(myWndId);
             _presenter = _apw.Presenter as OverlappedPresenter;
+            _presenter.IsMaximizable = false;
+            _presenter.SetBorderAndTitleBar(false,false);
+            _presenter.IsMinimizable = false;
+            
         }
         private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
@@ -261,9 +266,26 @@ namespace MageWin
             {
                 var color = GetSolidColorBrush("#554444ff").Color;
                 //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
-                FileMenu.Visibility = Visibility.Collapsed;
+                //FileMenu.Visibility = Visibility.Collapsed;
                 _presenter.SetBorderAndTitleBar(false, false);
 
+            }
+        }
+
+        private void Grid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+
+        }
+
+        private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (FileMenu.Visibility == Visibility.Visible)
+            {
+                FileMenu.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                FileMenu.Visibility = Visibility.Visible;
             }
         }
     }
