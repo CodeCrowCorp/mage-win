@@ -68,19 +68,19 @@ namespace MageWin
                             {
                                 if (json.user != null && json.user?.userId != null&&json.user.userId!=0)
                                 {
-                                    StackPanel mainStack = new StackPanel() { Orientation=Orientation.Horizontal, Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(10, 10, 0, 0) };
-                                    mainStack.PointerEntered += MainStack_PointerEntered;
-                                    mainStack.PointerExited += MainStack_PointerExited;
+                                    StackPanel mainStack = new StackPanel() { Orientation=Orientation.Horizontal, Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(10, 10, 0, 0)};
                                     //Border brd = new Border() { Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), CornerRadius = new CornerRadius(5), Padding = new Thickness(10, 0, 10, 0) };
 
-                                    TextBlock msgText = new TextBlock() {FontSize=20, Margin = new Thickness(20, 0, 0, 0), Text = json.message, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), HorizontalAlignment = HorizontalAlignment.Center };
+                                    TextBlock msgText = new TextBlock() {FontSize=15, Margin = new Thickness(20, 0, 0, 0), Text = json.message, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), HorizontalAlignment = HorizontalAlignment.Center, TextWrapping = TextWrapping.Wrap };
                                     //brd.Child = msgText;
                                     if (json.user != null)
                                     {
                                         //long unixDate = json.timestamp;
                                         DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                                         //DateTime date = start.AddMilliseconds(unixDate).ToLocalTime();
-                                        TextBlock userText = new TextBlock() {FontSize=22, Text = json.user.username, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White) };
+                                        TextBlock userText = new TextBlock() {FontSize=15, Text = json.user.username, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White),
+                                            HorizontalAlignment=HorizontalAlignment.Stretch, VerticalAlignment=VerticalAlignment.Stretch
+                                        };
                                         //TextBlock timeText = new TextBlock() { Text = date.ToString(), Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Black), FontSize = 8 };
                                         mainStack.Children.Add(userText);
                                         mainStack.Children.Add(msgText);
@@ -98,23 +98,6 @@ namespace MageWin
             catch (Exception ex)
             {
                 Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
-            }
-        }
-
-        private void MainStack_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            if (sender is StackPanel stack)
-            {
-                stack.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent);
-
-            }
-        }
-
-        private void MainStack_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (sender is StackPanel stack)
-            {
-                stack.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Gray);
             }
         }
 

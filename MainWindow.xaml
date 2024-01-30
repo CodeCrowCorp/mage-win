@@ -37,7 +37,7 @@
                 x:Name="ChatStack"
                 Margin="10"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom" />
+                VerticalAlignment="Bottom"/>
         </ScrollViewer>
         <Grid
             x:Name="SendMessageGrid"
