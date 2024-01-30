@@ -242,7 +242,7 @@ namespace MageWin
             {
                 var color = GetSolidColorBrush("#554444ff").Color;
                 //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.White };
-                //FileMenu.Visibility = Visibility.Visible;
+                FileMenu.Visibility = Visibility.Visible;
                 // _presenter.SetBorderAndTitleBar(true, true);
             }
         }
