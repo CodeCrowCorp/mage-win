@@ -87,8 +87,7 @@
                         x:Name="ChannelText"
                         Width="200"
                         Header="Enter channel id:"
-                        PlaceholderText="Channel id"
-                        Enter/>
+                        PlaceholderText="Channel id" />
                     <Button
                         Width="200"
                         Height="50"
