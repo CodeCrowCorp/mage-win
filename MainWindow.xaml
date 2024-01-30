@@ -14,12 +14,12 @@
             <RowDefinition Height="0.1*" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <controls:Menu>
-            <controls:MenuItem Name="FileMenu" Header="File">
+        <MenuBar>
+            <MenuBarItem Name="FileMenu" Title="File">
 
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
-            </controls:MenuItem>
-        </controls:Menu>
+            </MenuBarItem>
+        </MenuBar>
         <!--<AppBar x:Name="TopAppBar" Closing="AppBar_Closing">
             <StackPanel Orientation="Horizontal">
                 <Button
