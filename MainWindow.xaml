@@ -7,31 +7,60 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MageWin"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winuiex="using:WinUIEx"
+    x:Name="MainWindowUI"
     mc:Ignorable="d">
-
-    <Grid Loaded="Grid_Loaded">
+    <Grid
+        Background="Transparent"
+        Loaded="Grid_Loaded"
+        PointerEntered="Grid_PointerEntered"
+        PointerExited="Grid_PointerExited"
+        Tapped="Grid_Tapped">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*" />
             <RowDefinition />
+            <RowDefinition Height="0.1*" />
         </Grid.RowDefinitions>
-        <controls:Menu>
-            <controls:MenuItem Name="FileMenu" Header="File">
-
+        <MenuBar>
+            <MenuBarItem
+                Name="FileMenu"
+                Title="File"
+                Tapped="FileMenu_Tapped">
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
-            </controls:MenuItem>
-        </controls:Menu>
-        <!--<AppBar x:Name="TopAppBar" Closing="AppBar_Closing">
-            <StackPanel Orientation="Horizontal">
-                <Button
-                    x:Name="ChannelButton"
-                    Width="200"
-                    Height="70"
-                    Background="Transparent"
-                    Click="OpenChannel_Click"
-                    Content="Enter channel id" />
-
-            </StackPanel>
-        </AppBar>-->
+            </MenuBarItem>
+        </MenuBar>
+        <ScrollViewer
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <StackPanel
+                x:Name="ChatStack"
+                Margin="10"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom" />
+        </ScrollViewer>
+        <Grid
+            x:Name="SendMessageGrid"
+            Grid.Row="2"
+            Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="0.4*" />
+            </Grid.ColumnDefinitions>
+            <Button
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="DodgerBlue"
+                Click="Send_Click"
+                Content="Send"
+                Foreground="White" />
+            <TextBox
+                x:Name="MsgText"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                PlaceholderText="Message" />
+        </Grid>
         <Popup
             x:Name="ChannlePopUp"
             Grid.Row="1"
@@ -58,7 +87,8 @@
                         x:Name="ChannelText"
                         Width="200"
                         Header="Enter channel id:"
-                        PlaceholderText="Channel id" />
+                        PlaceholderText="Channel id"
+                        Enter/>
                     <Button
                         Width="200"
                         Height="50"
