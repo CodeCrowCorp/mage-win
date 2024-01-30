@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using Windows.Storage.Streams;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,10 +31,9 @@ namespace MageWin
             this.InitializeComponent();
             this.AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 300, 600));
             GetAppWindowAndPresenter();
-            _apw.IsShownInSwitchers = false;
+            _apw.IsShownInSwitchers = true;
             _presenter.SetBorderAndTitleBar(true, true);
             _presenter.IsMaximizable=false;
-
         }
         public SolidColorBrush GetSolidColorBrush(string hex)
         {

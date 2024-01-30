@@ -21,14 +21,14 @@
             <RowDefinition />
             <RowDefinition Height="0.1*" />
         </Grid.RowDefinitions>
-        <controls:Menu>
-            <controls:MenuItem
+        <MenuBar>
+            <MenuBarItem
                 Name="FileMenu"
-                Header="File"
+                Title="File"
                 Tapped="FileMenu_Tapped">
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
-            </controls:MenuItem>
-        </controls:Menu>
+            </MenuBarItem>
+        </MenuBar>
         <ScrollViewer
             Grid.Row="1"
             HorizontalAlignment="Stretch"
@@ -87,7 +87,8 @@
                         x:Name="ChannelText"
                         Width="200"
                         Header="Enter channel id:"
-                        PlaceholderText="Channel id" />
+                        PlaceholderText="Channel id"
+                        Enter/>
                     <Button
                         Width="200"
                         Height="50"
