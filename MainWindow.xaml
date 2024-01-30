@@ -22,7 +22,10 @@
             <RowDefinition Height="0.1*" />
         </Grid.RowDefinitions>
         <controls:Menu>
-            <controls:MenuItem Name="FileMenu" Header="File">
+            <controls:MenuItem
+                Name="FileMenu"
+                Header="File"
+                Tapped="FileMenu_Tapped">
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
             </controls:MenuItem>
         </controls:Menu>

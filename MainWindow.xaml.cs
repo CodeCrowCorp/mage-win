@@ -239,13 +239,13 @@ namespace MageWin
 
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (IsConnected)
-            {
-                var color = GetSolidColorBrush("#554444ff").Color;
-                //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.White };
-                //FileMenu.Visibility = Visibility.Visible;
-                // _presenter.SetBorderAndTitleBar(true, true);
-            }
+            //if (IsConnected)
+            //{
+            //    var color = GetSolidColorBrush("#554444ff").Color;
+            //    //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.White };
+            //    //FileMenu.Visibility = Visibility.Visible;
+            //    // _presenter.SetBorderAndTitleBar(true, true);
+            //}
         }
         private AppWindow _apw;
         private OverlappedPresenter _presenter;
@@ -264,10 +264,10 @@ namespace MageWin
         {
             if (IsConnected)
             {
-                var color = GetSolidColorBrush("#554444ff").Color;
-                //MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
-                //FileMenu.Visibility = Visibility.Collapsed;
-                _presenter.SetBorderAndTitleBar(false, false);
+                //var color = GetSolidColorBrush("#554444ff").Color;
+                ////MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
+                ////FileMenu.Visibility = Visibility.Collapsed;
+                //_presenter.SetBorderAndTitleBar(false, false);
 
             }
         }
@@ -279,14 +279,24 @@ namespace MageWin
 
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (FileMenu.Visibility == Visibility.Visible)
+            if (IsConnected)
             {
-                FileMenu.Visibility = Visibility.Collapsed;
+                if (FileMenu.Visibility == Visibility.Visible)
+                {
+                    FileMenu.Visibility = Visibility.Collapsed;
+                    _presenter.SetBorderAndTitleBar(false, false);
+                }
+                else
+                {
+                    FileMenu.Visibility = Visibility.Visible;
+                    _presenter.SetBorderAndTitleBar(true, true);
+                }
             }
-            else
-            {
-                FileMenu.Visibility = Visibility.Visible;
-            }
+        }
+
+        private void FileMenu_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ChannlePopUp.IsOpen = true;
         }
     }
 }
