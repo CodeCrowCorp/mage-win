@@ -9,7 +9,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winuiex="using:WinUIEx"
     x:Name="MainWindowUI"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    xmlns:tb="using:H.NotifyIcon"
+    >
     <Grid
         Background="Transparent"
         Loaded="Grid_Loaded"
@@ -21,6 +23,14 @@
             <RowDefinition />
             <RowDefinition Height="0.1*" />
         </Grid.RowDefinitions>
+        <tb:TaskbarIcon>
+            <tb:TaskbarIcon.IconSource>
+                <tb:GeneratedIconSource
+            Text="❤️"
+            Foreground="Red"
+            />
+            </tb:TaskbarIcon.IconSource>
+        </tb:TaskbarIcon>
         <MenuBar>
             <MenuBarItem
                 Name="FileMenu"
@@ -37,7 +47,7 @@
                 x:Name="ChatStack"
                 Margin="10"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom" />
+                VerticalAlignment="Bottom"/>
         </ScrollViewer>
         <Grid
             x:Name="SendMessageGrid"
@@ -87,8 +97,7 @@
                         x:Name="ChannelText"
                         Width="200"
                         Header="Enter channel id:"
-                        PlaceholderText="Channel id"
-                        Enter/>
+                        PlaceholderText="Channel id" />
                     <Button
                         Width="200"
                         Height="50"
