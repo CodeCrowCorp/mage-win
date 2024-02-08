@@ -1,6 +1,3 @@
-# This workflow will build, sign, and package a WinUI 3 MSIX desktop application
-# built on .NET.
-
 name: ci-prod.yml
 
 on:
@@ -30,8 +27,10 @@ jobs:
     - name: Build
       run: dotnet build
 
+    # Uncomment to enable testing
     # - name: Test with the dotnet CLI
     #   run: dotnet test
+
   deploy:
     if: ${{ github.actor != 'dependabot[bot]' }}
     name: Create MSIX package artifact
@@ -58,22 +57,24 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.3.2
+      uses: microsoft/setup-msbuild@v2.0.0
 
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
-        
-    - name: Decode the pfx
+
+    - name: Decode and Import the PFX certificate
       run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.BASE64_ENCODED_PFX }}")
-        $certificatePath = "GitHubActionsWorkflow.pfx"
-        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+        $pfxBase64 = "${{ secrets.BASE64_ENCODED_PFX }}"
+        $pfxPassword = "${{ secrets.PFX_CERT_PASSWORD }}"
+        $pfxPath = "GitHubActionsWorkflow.pfx"
+        $pfxPasswordSecure = ConvertTo-SecureString -String $pfxPassword -Force -AsPlainText
+        [System.Convert]::FromBase64String($pfxBase64) | Set-Content $pfxPath -AsByteStream
+        Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPasswordSecure
 
     - name: Create the app package
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword="${{ secrets.PFX_CERT_PASSWORD }}" /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true
-
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$pfxPath /p:PackageCertificatePassword=$pfxPassword /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true
       env:
         Appx_Bundle: Never
         Appx_Package_Build_Mode: SideloadOnly
@@ -81,9 +82,9 @@ jobs:
         Configuration: ${{ matrix.configuration }}
         Platform: ${{ matrix.platform }}
 
-    - name: Remove the pfx
-      run: Remove-Item -path GitHubActionsWorkflow.pfx
-      
+    - name: Remove the PFX certificate
+      run: Remove-Item -Path $pfxPath
+
     - name: Upload MSIX package
       uses: actions/upload-artifact@v4
       with:
