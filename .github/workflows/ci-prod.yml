@@ -88,13 +88,7 @@ jobs:
     - name: Upload MSIX package
       uses: actions/upload-artifact@v4
       with:
-        name: MSIX Package x64
-        path: Packages\*.msix
-
-    - name: Upload MSIX package
-      uses: actions/upload-artifact@v4
-      with:
-        name: MSIX Package x86
+        name: MSIX Package ${{ matrix.platform }}
         path: Packages\*.msix
 
   create-tag-and-release:
@@ -120,7 +114,6 @@ jobs:
       - name: Create release notes
         id: create-release-notes
         run: echo "Release notes content" > release-notes.md
-        # You may want to generate release notes dynamically or retrieve them from a file
 
       - name: Create a tag and release
         uses: softprops/action-gh-release@v1
