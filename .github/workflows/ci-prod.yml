@@ -97,27 +97,38 @@ jobs:
         name: MSIX Package x86
         path: Packages\*.msix
 
-    - name: Download all MSIX packages
-      uses: actions/download-artifact@v3
-      with:
-        path: downloaded-packages
-        
-    - name: Get Project version from Package.appxmanifest
-      id: project-version
-      shell: pwsh
-      run: |
-        [xml]$manifest = Get-Content -Path './Package.appxmanifest' # Make sure to update the path for the file
-        $version = $manifest.Package.Identity.Version
-        echo "::set-output name=current-version::$version"
+  create-tag-and-release:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Create a tag and release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: downloaded-packages/**/*.msix
-        tag_name: v${{ steps.project-version.outputs.current-version }}
-        name: Release v${{ steps.project-version.outputs.current-version }}
-        body: "Release notes or description"
-        generateReleaseNotes: true
-      continue-on-error: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download all MSIX packages
+        uses: actions/download-artifact@v3
+        with:
+          path: downloaded-packages
+        
+      - name: Get Project version from Package.appxmanifest
+        id: project-version
+        run: |
+          [xml]$manifest = Get-Content -Path './Package.appxmanifest' # Make sure to update the path for this file
+          $version = $manifest.Package.Identity.Version
+          echo "::set-output name=current-version::$version"
+
+      - name: Create release notes
+        id: create-release-notes
+        run: echo "Release notes content" > release-notes.md
+        # You may want to generate release notes dynamically or retrieve them from a file
+
+      - name: Create a tag and release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: downloaded-packages/**/*.msix
+          tag_name: v${{ steps.project-version.outputs.current-version }}
+          name: Release v${{ steps.project-version.outputs.current-version }}
+          body_path: release-notes.md
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
