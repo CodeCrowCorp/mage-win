@@ -106,7 +106,7 @@ jobs:
       id: project-version
       shell: pwsh
       run: |
-        [xml]$manifest = Get-Content -Path './Package.appxmanifest' # Make sure to update the path for this file
+        [xml]$manifest = Get-Content -Path './Package.appxmanifest' # Make sure to update the path for the file
         $version = $manifest.Package.Identity.Version
         echo "::set-output name=current-version::$version"
 
