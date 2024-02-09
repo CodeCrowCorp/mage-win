@@ -88,7 +88,13 @@ jobs:
     - name: Upload MSIX package
       uses: actions/upload-artifact@v4
       with:
-        name: MSIX Package ${{ matrix.platform }}
+        name: MSIX Package x64
+        path: Packages\*.msix
+
+    - name: Upload MSIX package
+      uses: actions/upload-artifact@v4
+      with:
+        name: MSIX Package x86
         path: Packages\*.msix
 
     - name: Download all MSIX packages
@@ -111,5 +117,7 @@ jobs:
         tag_name: v${{ steps.project-version.outputs.current-version }}
         name: Release v${{ steps.project-version.outputs.current-version }}
         body: "Release notes or description"
+        generateReleaseNotes: true
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
