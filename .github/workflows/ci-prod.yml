@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+  deployments: write
+
 jobs:
   test:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -78,7 +82,7 @@ jobs:
       env:
         Appx_Bundle: Never
         Appx_Package_Build_Mode: SideloadOnly
-        Appx_Package_Dir: Packages\
+        Appx_Package_Dir: ./AppPackages/
         Configuration: ${{ matrix.configuration }}
         Platform: ${{ matrix.platform }}
 
@@ -89,42 +93,41 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: MSIX Package ${{ matrix.platform }}
-        path: Packages\*.msix
+        path: ./AppPackages/**/*.msix
 
   create-tag-and-release:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    name: Create MSIX package artifact
+    name: Create Tag and Release
     needs: [deploy]
-
     runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [x64, x86]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download all MSIX packages
-        uses: actions/download-artifact@v3
         with:
-          path: downloaded-packages
-        
-      - name: Get Project version from Package.appxmanifest
-        id: project-version
-        run: |
-          [xml]$manifest = Get-Content -Path './Package.appxmanifest' # Make sure to update the path for this file
-          $version = $manifest.Package.Identity.Version
-          echo "::set-output name=current-version::$version"
+          fetch-depth: 0 # Fetches all history for all tags and branches
+                
+      - name: Download all MSIX packages
+        uses: actions/download-artifact@v4
 
-      - name: Create release notes
-        id: create-release-notes
-        run: echo "Release notes content" > release-notes.md
+      - name: Get Project version from Package.appxmanifest
+        id: project-version-latest
+        run: |
+          [xml]$manifest = Get-Content -Path './Package.appxmanifest' # The path to the Package.appxmanifest file in the root directory
+          $version = $manifest.Package.Identity.Version
+          echo "::set-output name=current-version::$version"      
 
       - name: Create a tag and release
         uses: softprops/action-gh-release@v1
+        continue-on-error: true
         with:
-          files: downloaded-packages/**/*.msix
-          tag_name: v${{ steps.project-version.outputs.current-version }}
-          name: Release v${{ steps.project-version.outputs.current-version }}
-          body_path: release-notes.md
+          files: |
+            ./**/*_${{ matrix.platform }}.msix
+          tag_name: ${{ steps.project-version-latest.outputs.current-version }}
+          name: v${{ steps.project-version-latest.outputs.current-version }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
