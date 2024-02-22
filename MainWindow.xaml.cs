@@ -95,22 +95,7 @@ namespace MageWin
         {
             if (json.user != null && json.user?.userId != null && json.user.userId != 0)
             {
-                StackPanel mainStack = new StackPanel() { Orientation = Orientation.Horizontal, Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.Transparent), HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(10, 10, 0, 0) };
-                TextBlock msgText = new TextBlock() { FontSize = 15, Margin = new Thickness(20, 0, 0, 0), Text = json.message, Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White), HorizontalAlignment = HorizontalAlignment.Center, TextWrapping = TextWrapping.Wrap };
-                if (json.user != null)
-                {
-                    TextBlock userText = new TextBlock()
-                    {
-                        FontSize = 15,
-                        Text = json.user.username,
-                        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White),
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch
-                    };
-                    mainStack.Children.Add(userText);
-                    mainStack.Children.Add(msgText);
-                    ChatStack.Children.Add(mainStack);
-                }
+                AddMessageToChat(json.user.username, json.message, GetSolidColorBrush(Util.GenerateRandomARGBHex()), new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White));
             }
         }
 
