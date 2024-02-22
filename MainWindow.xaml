@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Window
+<Window 
     x:Class="MageWin.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -17,20 +17,12 @@
         Loaded="Grid_Loaded"
         PointerEntered="Grid_PointerEntered"
         PointerExited="Grid_PointerExited"
-        Tapped="Grid_Tapped">
+       >
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*" />
             <RowDefinition />
             <RowDefinition Height="0.1*" />
         </Grid.RowDefinitions>
-        <tb:TaskbarIcon>
-            <tb:TaskbarIcon.IconSource>
-                <tb:GeneratedIconSource
-            Text="❤️"
-            Foreground="Red"
-            />
-            </tb:TaskbarIcon.IconSource>
-        </tb:TaskbarIcon>
         <MenuBar>
             <MenuBarItem
                 Name="FileMenu"
@@ -39,7 +31,7 @@
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
             </MenuBarItem>
         </MenuBar>
-        <ScrollViewer
+        <ScrollViewer x:Name="ConversationScrollViewer"
             Grid.Row="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
@@ -47,7 +39,21 @@
                 x:Name="ChatStack"
                 Margin="10"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom"/>
+                VerticalAlignment="Bottom" >
+                <ListView   x:Name="ConversationList" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5">
+                                <TextBlock x:Name="TextBlockChat" TextWrapping="Wrap"  Margin="5">
+                                    <Run x:Name="Prefix" Text="{Binding Prefix}" Foreground="{Binding PrefixColor}"/>
+                                    <Run x:Name="Message" Text="{Binding Message}" Foreground="{Binding MessageColor}" />
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ListView>
+                <ProgressBar x:Name="ResponseProgressBar" Height="5" IsIndeterminate="True" Visibility="Collapsed"/>
+            </StackPanel>
         </ScrollViewer>
         <Grid
             x:Name="SendMessageGrid"

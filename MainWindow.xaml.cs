@@ -13,6 +13,13 @@ using Windows.Storage.Streams;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System;
+using WinUIEx;
+using Microsoft.UI.Xaml.Documents;
+using System.Collections.ObjectModel;
+using Windows.ApplicationModel.Chat;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using MageWin.Utils;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,6 +31,8 @@ namespace MageWin
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+
+        public ObservableCollection<Helpers.ChatMessage> ChatMessages { get; } = new ObservableCollection<Helpers.ChatMessage>();
         private Windows.Networking.Sockets.MessageWebSocket webSocket;
         private DispatcherQueue _dispatcherQueue;
         public MainWindow()
@@ -34,7 +43,10 @@ namespace MageWin
             _apw.IsShownInSwitchers = true;
             _presenter.SetBorderAndTitleBar(true, true);
             _presenter.IsMaximizable=false;
+            ConversationList.ItemsSource = ChatMessages;
+            this.CenterOnScreen();
         }
+
         public SolidColorBrush GetSolidColorBrush(string hex)
         {
             hex = hex.Replace("#", string.Empty);
@@ -140,6 +152,7 @@ namespace MageWin
         {
             try
             {
+                ResponseProgressBar.Visibility = Visibility.Visible;
                 var client = new HttpClient();
                 var res = await client.GetStringAsync("https://api.mage.stream/wsinit/channelid?channelId=" + ChannelText.Text);
                 SendMessageGrid.Visibility = Visibility.Collapsed;
@@ -149,11 +162,7 @@ namespace MageWin
                 webSocket.Closed += WebSocket_Closed;
                 try
                 {
-                    var color = GetSolidColorBrush("#554444ff").Color;
-                    MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
-                    FileMenu.Visibility = Visibility.Collapsed;
-                    _presenter.SetBorderAndTitleBar(false, false);
-                    _presenter.IsResizable = false;
+
                     Task connectTask = webSocket.ConnectAsync(new Uri("wss://api.mage.stream/wsinit/channelid/" + res + "/connect")).AsTask();
                     IsConnected = true;
                     var data = new
@@ -165,7 +174,7 @@ namespace MageWin
                     };
                     string jsonString = System.Text.Json.JsonSerializer.Serialize(data);
                     _ = connectTask.ContinueWith(_ => this.SendMessageUsingMessageWebSocketAsync(jsonString));
-
+                  
                 }
                 catch (Exception ex)
                 {
@@ -173,6 +182,7 @@ namespace MageWin
                     // Add additional code here to handle exceptions.
                 }
                 ChannlePopUp.IsOpen = false;
+                ResponseProgressBar.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
@@ -214,13 +224,20 @@ namespace MageWin
         }
         private async void Send_Click(object sender, RoutedEventArgs e)
         {
+            ResponseProgressBar.Visibility = Visibility.Visible;
             if (!string.IsNullOrEmpty(MsgText.Text))
             {
                 MessageData data = new MessageData() { eventName = "from app", message = MsgText.Text, timestamp = DateTime.Now.Ticks, user = new User() { userId = 1, username = "app user" } };
                 var msg = JsonConvert.SerializeObject(data);
                 await SendMessageUsingMessageWebSocketAsync(msg);
+              
+                AddMessageToChat(data.user.username, data.message, GetSolidColorBrush(Util.GenerateRandomARGBHex()), new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White));
+                ConversationScrollViewer.UpdateLayout();
+                ConversationScrollViewer.ChangeView(null, ConversationScrollViewer.ScrollableHeight, null);
+                ResponseProgressBar.Visibility = Visibility.Collapsed;
                 MsgText.Text = "";
             }
+            ResponseProgressBar.Visibility = Visibility.Collapsed;
         }
 
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -263,26 +280,48 @@ namespace MageWin
 
         }
 
-        private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (IsConnected)
-            {
-                if (FileMenu.Visibility == Visibility.Visible)
-                {
-                    FileMenu.Visibility = Visibility.Collapsed;
-                    _presenter.SetBorderAndTitleBar(false, false);
-                }
-                else
-                {
-                    FileMenu.Visibility = Visibility.Visible;
-                    _presenter.SetBorderAndTitleBar(true, true);
-                }
-            }
-        }
-
         private void FileMenu_Tapped(object sender, TappedRoutedEventArgs e)
         {
             ChannlePopUp.IsOpen = true;
         }
+
+        private void OpenTrayIcon_Click(object sender, RoutedEventArgs e)
+        {
+            this.AppWindow.Show(true);
+        }
+
+        private void CloseTrayIcon_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Exit();
+        }
+     
+        private void AddMessageToChat(string prefix, string message, SolidColorBrush prefixColor, SolidColorBrush messageColor)
+        {
+            ChatMessages.Add(new Helpers.ChatMessage(prefix, $"\r\n{message}", prefixColor, messageColor));
+        }
+  
+
+        public void LockScreen() {
+            var color = GetSolidColorBrush("#554444ff").Color;
+            MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
+            FileMenu.Visibility = Visibility.Collapsed;
+            _presenter.SetBorderAndTitleBar(false, false);
+            _presenter.IsResizable = false;
+            MainWindowUI.Show();
+            MainWindowUI.Activate();
+            MainWindowUI.SetIsAlwaysOnTop(true);
+            MainWindowUI.Move(0, 0);
+        }
+
+        public void UnlockScreen() 
+        {
+            MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.White };
+            FileMenu.Visibility = Visibility.Visible;
+            _presenter.SetBorderAndTitleBar(true, true);
+            _presenter.IsResizable = true;
+            MainWindowUI.SetIsAlwaysOnTop(false);
+            MainWindowUI.CenterOnScreen();
+        }
+      
     }
 }
