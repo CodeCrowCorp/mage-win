@@ -20,6 +20,7 @@ using Windows.ApplicationModel.Chat;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using MageWin.Utils;
+using System.Runtime.InteropServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,6 +32,17 @@ namespace MageWin
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        //public const int WS_EX_TRANSPARENT = 0x00000020;
+        //public const int GWL_EXSTYLE = (-20);
+
+
+        //[DllImport("user32.dll")]
+        //public static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        //[DllImport("user32.dll")]
+        //public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+  
 
         public ObservableCollection<Helpers.ChatMessage> ChatMessages { get; } = new ObservableCollection<Helpers.ChatMessage>();
         private Windows.Networking.Sockets.MessageWebSocket webSocket;
@@ -45,7 +57,12 @@ namespace MageWin
             _presenter.IsMaximizable=false;
             ConversationList.ItemsSource = ChatMessages;
             this.CenterOnScreen();
+            //this.SetWindowStyle(WindowStyle.Disabled);
+            
+
         }
+
+
 
         public SolidColorBrush GetSolidColorBrush(string hex)
         {
@@ -282,7 +299,7 @@ namespace MageWin
      
         private void AddMessageToChat(string prefix, string message, SolidColorBrush prefixColor, SolidColorBrush messageColor)
         {
-            ChatMessages.Add(new Helpers.ChatMessage(prefix, $"\r\n{message}", prefixColor, messageColor));
+            ChatMessages.Add(new Helpers.ChatMessage(prefix, $"{message}", prefixColor, messageColor));
         }
   
 
@@ -296,6 +313,7 @@ namespace MageWin
             MainWindowUI.Activate();
             MainWindowUI.SetIsAlwaysOnTop(true);
             MainWindowUI.Move(0, 0);
+            SetTransparentWindowNonInteractive(true);
         }
 
         public void UnlockScreen() 
@@ -306,7 +324,36 @@ namespace MageWin
             _presenter.IsResizable = true;
             MainWindowUI.SetIsAlwaysOnTop(false);
             MainWindowUI.CenterOnScreen();
+            SetTransparentWindowNonInteractive(false);
         }
       
+        public void SetTransparentWindowNonInteractive(bool nonInteractive)
+        {
+
+            if (nonInteractive)
+            {
+                this.SetWindowOpacity(255);
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+                int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+                SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT);
+            }
+            else {
+                this.SetWindowOpacity(255);
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+                int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+                SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle & ~WS_EX_TRANSPARENT);
+            }
+        }
+
+        public const int WS_EX_TRANSPARENT = 0x00000020;
+        public const int GWL_EXSTYLE = (-20);
+
+
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
     }
 }
