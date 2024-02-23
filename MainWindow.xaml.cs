@@ -287,7 +287,7 @@ namespace MageWin
   
 
         public void LockScreen() {
-            var color = GetSolidColorBrush("#554444ff").Color;
+            var color = GetSolidColorBrush("#000000ff").Color;
             MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
             FileMenu.Visibility = Visibility.Collapsed;
             _presenter.SetBorderAndTitleBar(false, false);
