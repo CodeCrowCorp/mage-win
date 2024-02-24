@@ -44,6 +44,11 @@
     <None Include=".github\workflows\ci-dev.yml" />
     <None Include=".github\workflows\ci-prod.yml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="TrayIconResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
 
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 

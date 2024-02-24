@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using H.NotifyIcon;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -15,6 +16,8 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ViewManagement;
+using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,7 +28,13 @@ namespace MageWin
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     public partial class App : Application
-    {
+    {    
+        public bool _lockScreen;
+        public TaskbarIcon? TrayIcon { get; private set; }
+        public MainWindow? Window { get; set; }
+
+        public bool HandleClosedEvents { get; set; } = true;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -41,10 +50,79 @@ namespace MageWin
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
-            m_window.Activate();
+            InitializeTrayIcon();
         }
 
-        private Window m_window;
+        private void InitializeTrayIcon()
+        {
+            var OpenWindowCommand = (XamlUICommand)Resources["OpenWindowCommand"];
+            OpenWindowCommand.ExecuteRequested += OpenWindowCommand_ExecuteRequested;
+
+            var lockUnlockWindowCommand = (XamlUICommand)Resources["LockUnlockWindowCommand"];
+            lockUnlockWindowCommand.ExecuteRequested += LockUnlockWindowCommand_ExecuteRequested;
+
+            var exitApplicationCommand = (XamlUICommand)Resources["ExitApplicationCommand"];
+            exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
+
+            TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
+            TrayIcon.ForceCreate();
+
+            OpenWindowCommand.Execute(this);
+        }
+
+        private void OpenWindowCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {           
+            if (Window == null)
+            {
+              
+                Window = new MainWindow();
+                Window.Closed += (sender, args) =>
+                {
+                    if (HandleClosedEvents)
+                    {
+                        args.Handled = true;
+                        Window.Hide();
+                    }
+                };
+               
+                Window.Show();
+                return;
+            }           
+            else
+            {
+                Window.Show();
+                Window.Activate();
+            }
+        }
+
+        private void ExitApplicationCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {
+            HandleClosedEvents = false;
+            TrayIcon?.Dispose();
+            Window?.Close();
+
+         
+            if (Window == null)
+            {
+                Environment.Exit(0);
+            }
+        }
+
+        private void LockUnlockWindowCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {
+
+            if (_lockScreen)
+            {
+                
+                Window.UnlockScreen();
+                _lockScreen = false;
+            }
+            else {
+                Window.LockScreen();
+                _lockScreen = true;
+            }
+   
+        }
+
     }
 }
