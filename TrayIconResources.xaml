@@ -20,12 +20,12 @@
     </XamlUICommand>
     <XamlUICommand
         x:Key="LockUnlockWindowCommand"
-        Label="Lock/Unlock"
-        Description="Lock/Unlock"
+        Label="Ghost Mode"
+        Description="Ghost Mode"
     >
-        <XamlUICommand.IconSource>
+        <!--<XamlUICommand.IconSource>
             <SymbolIconSource Symbol="SetLockScreen" />
-        </XamlUICommand.IconSource>
+        </XamlUICommand.IconSource>-->
         <XamlUICommand.KeyboardAccelerators>
             <KeyboardAccelerator
             Key="S"
@@ -38,9 +38,9 @@
         Label="Exit"
         Description="Exit"
         >
-        <XamlUICommand.IconSource>
+        <!--<XamlUICommand.IconSource>
             <SymbolIconSource Symbol="ClosePane" />
-        </XamlUICommand.IconSource>
+        </XamlUICommand.IconSource>-->
         <XamlUICommand.KeyboardAccelerators>
             <KeyboardAccelerator
                 Key="E"

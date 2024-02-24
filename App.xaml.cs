@@ -16,6 +16,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ViewManagement;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -67,7 +68,6 @@ namespace MageWin
             TrayIcon.ForceCreate();
 
             OpenWindowCommand.Execute(this);
-
         }
 
         private void OpenWindowCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)

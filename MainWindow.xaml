@@ -15,8 +15,6 @@
     <Grid
         Background="Transparent"
         Loaded="Grid_Loaded"
-        PointerEntered="Grid_PointerEntered"
-        PointerExited="Grid_PointerExited"
        >
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*" />
@@ -26,9 +24,10 @@
         <MenuBar>
             <MenuBarItem
                 Name="FileMenu"
-                Title="File"
-                Tapped="FileMenu_Tapped">
+                Title="File">
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
+                <MenuFlyoutItem Command="{StaticResource LockUnlockWindowCommand}" />
+                <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
             </MenuBarItem>
         </MenuBar>
         <ScrollViewer x:Name="ConversationScrollViewer"
