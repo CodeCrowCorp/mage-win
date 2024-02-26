@@ -34,7 +34,7 @@
             Grid.Row="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
-            <StackPanel
+            <StackPanel            
                 x:Name="ChatStack"
                 Margin="10"
                 HorizontalAlignment="Stretch"
@@ -90,14 +90,16 @@
                 </TransitionCollection>
             </Popup.ChildTransitions>
             <Grid
+               Margin="0 -100 0 0"
                 Width="200"
-                Height="200"
+                Height="300"                 
                 CornerRadius="5"
                 RowSpacing="0">
-                <StackPanel
-                    Grid.Row="1"
+                <StackPanel                           
+                    Grid.Row="1"  
                     HorizontalAlignment="Center"
                     Orientation="Vertical">
+                    <Image Source="/Assets/Mage100x100.png" Width="100" Height="100" Margin="0,0,0,40"/>
                     <TextBox
                         x:Name="ChannelText"
                         Width="200"

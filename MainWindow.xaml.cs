@@ -44,7 +44,6 @@ namespace MageWin
             _presenter.SetBorderAndTitleBar(true, true);
             ConversationList.ItemsSource = ChatMessages;
             this.CenterOnScreen();
-            //this.SetWindowStyle(WindowStyle.Disabled);
             
             Title = "Mage";
         }
@@ -81,6 +80,12 @@ namespace MageWin
                             if (json != null && json.message != null)
                             {
                                 addMessageToStack(json);
+                                if (IsVerticalScrollFullyDown())
+                                {
+                                    ConversationScrollViewer.UpdateLayout();
+                                    ConversationScrollViewer.ChangeView(null, ConversationScrollViewer.ScrollableHeight, null);
+                                }
+                                    
                             }
                         }
                     });
@@ -204,8 +209,11 @@ namespace MageWin
                 await SendMessageUsingMessageWebSocketAsync(msg);
               
                 AddMessageToChat(data.user.username, data.message, GetSolidColorBrush(Util.GenerateRandomARGBHex()), new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White));
-                ConversationScrollViewer.UpdateLayout();
-                ConversationScrollViewer.ChangeView(null, ConversationScrollViewer.ScrollableHeight, null);
+                if (IsVerticalScrollFullyDown())
+                {
+                    ConversationScrollViewer.UpdateLayout();
+                    ConversationScrollViewer.ChangeView(null, ConversationScrollViewer.ScrollableHeight, null);
+                }            
                 ResponseProgressBar.Visibility = Visibility.Collapsed;
                 MsgText.Text = "";
             }
@@ -283,5 +291,9 @@ namespace MageWin
         [DllImport("user32.dll")]
         public static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
 
+        public bool IsVerticalScrollFullyDown()
+        {
+            return this.ConversationScrollViewer.VerticalOffset == ConversationScrollViewer.ScrollableHeight;
+        }     
     }
 }

@@ -1,10 +1,12 @@
 ﻿using H.NotifyIcon;
+using H.NotifyIcon.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
@@ -17,6 +19,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.ViewManagement;
+using WinUIEx;
 using LaunchActivatedEventArgs = Microsoft.UI.Xaml.LaunchActivatedEventArgs;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -65,6 +68,8 @@ namespace MageWin
             exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
 
             TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
+            Image img = new Image();
+            TrayIcon.IconSource = new BitmapImage(new Uri("ms-appx:///Assets/Mage16x16.ico"));
             TrayIcon.ForceCreate();
 
             OpenWindowCommand.Execute(this);
@@ -85,6 +90,7 @@ namespace MageWin
                     }
                 };
                
+                Window.SetIcon("Assets/Mage16x16.ico");
                 Window.Show();
                 return;
             }           
