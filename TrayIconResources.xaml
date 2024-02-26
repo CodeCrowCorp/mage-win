@@ -51,7 +51,7 @@
     <tb:TaskbarIcon
         x:Key="TrayIcon"
         Visibility="Visible"
-        ToolTipText="ToolTip"
+        ToolTipText="Mage"
         ContextMenuMode="PopupMenu"
         LeftClickCommand="{StaticResource OpenWindowCommand}"
         NoLeftClickDelay="True"
