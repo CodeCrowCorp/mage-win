@@ -54,14 +54,9 @@
         ToolTipText="ToolTip"
         ContextMenuMode="PopupMenu"
         LeftClickCommand="{StaticResource OpenWindowCommand}"
-        NoLeftClickDelay="True">
+        NoLeftClickDelay="True"
+        >
 
-        <tb:TaskbarIcon.IconSource>
-            <tb:GeneratedIconSource
-                 Text="❤️"
-                 Foreground="Red"
-                />
-        </tb:TaskbarIcon.IconSource>
         <tb:TaskbarIcon.ContextFlyout>
             <MenuFlyout>
                 <MenuFlyoutItem Command="{StaticResource OpenWindowCommand}" />
