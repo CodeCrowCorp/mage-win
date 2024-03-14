@@ -121,7 +121,7 @@ jobs:
           echo "::set-output name=current-version::$version"      
 
       - name: Create a tag and release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         continue-on-error: true
         with:
           files: |
