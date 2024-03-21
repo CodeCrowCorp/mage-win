@@ -29,6 +29,13 @@
                 <MenuFlyoutItem Command="{StaticResource LockUnlockWindowCommand}" />
                 <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
             </MenuBarItem>
+            <MenuBarItem
+                Name="HelpMenu"
+                Title="Help">
+                <MenuFlyoutItem Command="{StaticResource GitHubCommand}" />
+                <MenuFlyoutItem Command="{StaticResource DiscordCommand}" />
+                <!--<MenuFlyoutItem Text="{GetAppVersion()}" />-->
+            </MenuBarItem>
         </MenuBar>
         <ScrollViewer x:Name="ConversationScrollViewer"
             Grid.Row="1"
