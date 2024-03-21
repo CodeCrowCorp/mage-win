@@ -25,7 +25,7 @@
             <MenuBarItem
                 Name="FileMenu"
                 Title="File">
-                <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel Id" />
+                <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel ID" />
                 <MenuFlyoutItem Command="{StaticResource LockUnlockWindowCommand}" />
                 <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
             </MenuBarItem>
@@ -103,12 +103,13 @@
                     <TextBox
                         x:Name="ChannelText"
                         Width="200"
-                        Header="Enter channel id:"
-                        PlaceholderText="Channel id" />
+                        Header="Channel ID"
+                        PlaceholderText="e.g. 65" />
                     <Button
                         Width="200"
                         Height="50"
-                        Background="CadetBlue"
+                        Background="Indigo"
+                        Foreground="White"
                         Click="Channel_Click"
                         Content="Submit" />
                 </StackPanel>
