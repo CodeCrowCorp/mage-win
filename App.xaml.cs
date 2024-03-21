@@ -67,6 +67,12 @@ namespace MageWin
             var exitApplicationCommand = (XamlUICommand)Resources["ExitApplicationCommand"];
             exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
 
+            var githubCommand = (XamlUICommand)Resources["GitHubCommand"];
+            githubCommand.ExecuteRequested += GitHubCommand_ExecuteRequested;
+
+            var discordCommand = (XamlUICommand)Resources["DiscordCommand"];
+            discordCommand.ExecuteRequested += DiscordCommand_ExecuteRequested;
+
             TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
             Image img = new Image();
             TrayIcon.IconSource = new BitmapImage(new Uri("ms-appx:///Assets/Mage16x16.ico"));
@@ -130,5 +136,14 @@ namespace MageWin
    
         }
 
+        async private void GitHubCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {
+            _ = await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/CodeCrowCorp/mage-win"));
+        }
+
+        async private void DiscordCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {
+            _ = await Windows.System.Launcher.LaunchUriAsync(new Uri("https://discord.mage.stream"));
+        }
     }
 }

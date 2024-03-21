@@ -14,14 +14,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System;
 using WinUIEx;
-using Microsoft.UI.Xaml.Documents;
 using System.Collections.ObjectModel;
-using Windows.ApplicationModel.Chat;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using MageWin.Utils;
 using System.Runtime.InteropServices;
-using System.Linq;
+using Windows.ApplicationModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -46,6 +42,15 @@ namespace MageWin
             this.CenterOnScreen();
             
             Title = "Mage";
+        }
+
+        public static string GetAppVersion()
+        {
+            Package package = Package.Current;
+            PackageId packageId = package.Id;
+            PackageVersion version = packageId.Version;
+
+            return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
         }
 
         public SolidColorBrush GetSolidColorBrush(string hex)
@@ -294,6 +299,6 @@ namespace MageWin
         public bool IsVerticalScrollFullyDown()
         {
             return this.ConversationScrollViewer.VerticalOffset == ConversationScrollViewer.ScrollableHeight;
-        }     
+        }   
     }
 }
