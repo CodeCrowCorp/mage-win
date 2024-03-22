@@ -48,6 +48,30 @@
                 />
         </XamlUICommand.KeyboardAccelerators>
     </XamlUICommand>
+    <XamlUICommand
+        x:Key="GitHubCommand"
+        Label="GitHub"
+        Description="GitHub"
+    >
+        <XamlUICommand.KeyboardAccelerators>
+            <KeyboardAccelerator
+            Key="G"
+            Modifiers="Control"
+            />
+        </XamlUICommand.KeyboardAccelerators>
+    </XamlUICommand>
+    <XamlUICommand
+        x:Key="DiscordCommand"
+        Label="Discord"
+        Description="Discord"
+    >
+        <XamlUICommand.KeyboardAccelerators>
+            <KeyboardAccelerator
+            Key="D"
+            Modifiers="Control"
+            />
+        </XamlUICommand.KeyboardAccelerators>
+    </XamlUICommand>
     <tb:TaskbarIcon
         x:Key="TrayIcon"
         Visibility="Visible"
