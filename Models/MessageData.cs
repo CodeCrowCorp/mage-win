@@ -12,6 +12,7 @@ namespace MageWin.Models
         public User user { get; set; }
         public long timestamp { get; set; }
         public string message { get; set; }
+        public string platform { get; set; }
     }
 
     public class User

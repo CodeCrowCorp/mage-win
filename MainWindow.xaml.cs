@@ -1,10 +1,7 @@
 using MageWin.Models;
 using Microsoft.UI;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,6 +15,9 @@ using System.Collections.ObjectModel;
 using MageWin.Utils;
 using System.Runtime.InteropServices;
 using Windows.ApplicationModel;
+using MageWin.Entities;
+using MageWin.Models.YoutubeMessageData;
+using User = MageWin.Models.User;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,6 +31,9 @@ namespace MageWin
     {
         public ObservableCollection<Helpers.ChatMessage> ChatMessages { get; } = new ObservableCollection<Helpers.ChatMessage>();
         private Windows.Networking.Sockets.MessageWebSocket webSocket;
+        private DispatcherTimer _youtubeTimer;
+        private Youtube _youtube;
+        public string _channelId { get; set; }
         public MainWindow()
         {
             this.InitializeComponent();
@@ -40,7 +43,7 @@ namespace MageWin
             _presenter.SetBorderAndTitleBar(true, true);
             ConversationList.ItemsSource = ChatMessages;
             this.CenterOnScreen();
-            
+
             Title = "Mage";
         }
 
@@ -170,8 +173,10 @@ namespace MageWin
                         user = new { userId = 0, username = "guest" }
                     };
                     string jsonString = System.Text.Json.JsonSerializer.Serialize(data);
-                    _ = connectTask.ContinueWith(_ => this.SendMessageUsingMessageWebSocketAsync(jsonString));
-                  
+                    _ = connectTask.ContinueWith(_ => this.SendMessageUsingMessageWebSocketAsync(jsonString))
+                                   .ContinueWith(_ => this.ListenForPlatformsMessages());
+
+                    _channelId = ChannelText.Text;
                 }
                 catch (Exception ex)
                 {
@@ -299,6 +304,54 @@ namespace MageWin
         public bool IsVerticalScrollFullyDown()
         {
             return this.ConversationScrollViewer.VerticalOffset == ConversationScrollViewer.ScrollableHeight;
-        }   
+        }
+
+        public async Task ListenForPlatformsMessages() {           
+            await ListenYoutubeMessages();          
+        }
+        public async Task ListenYoutubeMessages() {
+
+            ///ChannelId
+            _youtube = new Youtube("UCNZCKDhAVtbh7sddChTxI7w");
+            await _youtube.Initialize();
+
+            if (_youtube.IsLive)
+            {
+                _ = Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        await SendYoutubeMessagesToSocket();
+                        await Task.Delay(TimeSpan.FromSeconds(10));
+                    }
+                });
+            }
+        }
+        public async Task  SendYoutubeMessagesToSocket()
+        {
+            var chatMessages = await _youtube.GetChatMessages(_youtube.GetNextPageToken());
+            if (chatMessages != null) {
+                this.DispatcherQueue.TryEnqueue(async () =>
+                {
+                    foreach (var message in chatMessages)
+                    {
+                        YoutubeMessageData data = new YoutubeMessageData()
+                        {
+                            eventName = "channel-message",
+                            timestamp = message.Snippet.PublishedAt.ToUnixTimestamp(),
+                            user = new Models.YoutubeMessageData.User()
+                            {
+                                username = message.AuthorDetails.DisplayName,
+                                userId = "Youtube"
+                            },
+                            platform = "Youtube"
+                        };
+
+                        var msg = JsonConvert.SerializeObject(data);
+                        await SendMessageUsingMessageWebSocketAsync(msg);
+                    }
+                });
+            }            
+        }
     }
 }

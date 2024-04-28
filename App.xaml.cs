@@ -1,5 +1,7 @@
 ﻿using H.NotifyIcon;
 using H.NotifyIcon.Core;
+using MageWin.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -35,6 +37,8 @@ namespace MageWin
         public bool _lockScreen;
         public TaskbarIcon? TrayIcon { get; private set; }
         public MainWindow? Window { get; set; }
+        public static IServiceProvider ServiceProvider { get; private set; }
+
 
         public bool HandleClosedEvents { get; set; } = true;
 
@@ -53,6 +57,9 @@ namespace MageWin
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            var services = new ServiceCollection();
+            DependencyConfiguration.Configure(services);
+            ServiceProvider = services.BuildServiceProvider();
             InitializeTrayIcon();
         }
 
