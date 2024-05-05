@@ -52,14 +52,16 @@ namespace MageWin.Services
             }
             else
             {
-                throw new HttpRequestException($"Erro na requisição: {response.StatusCode}");
+                throw new HttpRequestException($"Error to request: {response.StatusCode}");
             }
         }
 
         private string ToQueryString(object parameters)
         {
             var properties = parameters.GetType().GetProperties();
-            var keyValuePairs = properties.Select(p => $"{p.Name}={HttpUtility.UrlEncode(p.GetValue(parameters)?.ToString() ?? "")}");
+            var keyValuePairs = properties
+                .Where(p => p.GetValue(parameters) != null && !string.IsNullOrWhiteSpace(p.GetValue(parameters)?.ToString()))
+                .Select(p => $"{p.Name}={HttpUtility.UrlEncode(p.GetValue(parameters).ToString())}");
             return string.Join("&", keyValuePairs);
         }
     }

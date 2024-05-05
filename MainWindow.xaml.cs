@@ -1,4 +1,3 @@
-using MageWin.Models;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -16,8 +15,16 @@ using MageWin.Utils;
 using System.Runtime.InteropServices;
 using Windows.ApplicationModel;
 using MageWin.Entities;
-using MageWin.Models.YoutubeMessageData;
-using User = MageWin.Models.User;
+using CommunityToolkit.WinUI.UI.Controls;
+using Windows.Foundation.Metadata;
+using MageWin.Enums;
+using Microsoft.UI.Xaml.Controls;
+using System.Net.WebSockets;
+using MageWin.Models.Socket;
+using MageWin.Models.Socket.MessageDataReceive;
+using WinUIEx.Messaging;
+using ColorCode.Compilation.Languages;
+using System.Configuration;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,7 +39,7 @@ namespace MageWin
         public ObservableCollection<Helpers.ChatMessage> ChatMessages { get; } = new ObservableCollection<Helpers.ChatMessage>();
         private Windows.Networking.Sockets.MessageWebSocket webSocket;
         private DispatcherTimer _youtubeTimer;
-        private Youtube _youtube;
+        private MageChannel _mageChannel;
         public string _channelId { get; set; }
         public MainWindow()
         {
@@ -84,10 +91,10 @@ namespace MageWin
                     {
                         if (IsValidJson(message))
                         {
-                            var json = JsonConvert.DeserializeObject<MessageData>(message);
+                            var json = JsonConvert.DeserializeObject<MessageDataReceive>(message);
                             if (json != null && json.message != null)
                             {
-                                addMessageToStack(json);
+                                AddMessageToStack(json);
                                 if (IsVerticalScrollFullyDown())
                                 {
                                     ConversationScrollViewer.UpdateLayout();
@@ -106,11 +113,12 @@ namespace MageWin
             }
         }
 
-        private void addMessageToStack(MessageData json)
+        private void AddMessageToStack(MessageDataReceive json)
         {
-            if (json.user != null && json.user?.userId != null && json.user.userId != 0)
+            if (json.user != null && json.user?.userId != null)
             {
-                AddMessageToChat(json.user.username, json.message, GetSolidColorBrush(Util.GenerateRandomARGBHex()), new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White));
+                UserRoleType userRole = _mageChannel.GetUserRoleById(json.user.userId);
+                AddMessageToChat(json.user.username, json.message, GetSolidColorBrush(_mageChannel.GetNameColorByRole(userRole)), GetSolidColorBrush(ConfigurationManager.AppSettings["default-color"]), GetSolidColorBrush(_mageChannel.GetTagColorByRole(userRole)),_mageChannel.GetTagTextByRole(userRole), json.iconUrl);
             }
         }
 
@@ -174,7 +182,7 @@ namespace MageWin
                     };
                     string jsonString = System.Text.Json.JsonSerializer.Serialize(data);
                     _ = connectTask.ContinueWith(_ => this.SendMessageUsingMessageWebSocketAsync(jsonString))
-                                   .ContinueWith(_ => this.ListenForPlatformsMessages());
+                                   .ContinueWith(_ => this.InitializeChannel(data.channelId, webSocket));
 
                     _channelId = ChannelText.Text;
                 }
@@ -214,11 +222,25 @@ namespace MageWin
             ResponseProgressBar.Visibility = Visibility.Visible;
             if (!string.IsNullOrEmpty(MsgText.Text))
             {
-                MessageData data = new MessageData() { eventName = "from app", message = MsgText.Text, timestamp = DateTime.Now.Ticks, user = new User() { userId = 1, username = "app user" } };
+                MessageDataRequest data = new MessageDataRequest()
+                {
+                    eventName = "channel-message",
+                    channelId = _channelId,
+                    message = new Models.Socket.Message()
+                    {
+                        body = MsgText.Text,
+                        platform = "",
+                        user = new Models.Socket.User()
+                        {
+                            userId = "0",
+                            username = "app user"
+                        },
+                        isAiChatEnabled = false
+                    }
+                };
                 var msg = JsonConvert.SerializeObject(data);
                 await SendMessageUsingMessageWebSocketAsync(msg);
               
-                AddMessageToChat(data.user.username, data.message, GetSolidColorBrush(Util.GenerateRandomARGBHex()), new Microsoft.UI.Xaml.Media.SolidColorBrush(Colors.White));
                 if (IsVerticalScrollFullyDown())
                 {
                     ConversationScrollViewer.UpdateLayout();
@@ -242,9 +264,9 @@ namespace MageWin
         }
 
      
-        private void AddMessageToChat(string prefix, string message, SolidColorBrush prefixColor, SolidColorBrush messageColor)
+        private void AddMessageToChat(string prefix, string message, SolidColorBrush prefixColor, SolidColorBrush messageColor,SolidColorBrush tagColor,string tagText,string iconPath = null)
         {
-            ChatMessages.Add(new Helpers.ChatMessage($"@{prefix}", message, prefixColor, messageColor));
+            ChatMessages.Add(new Helpers.ChatMessage($"@{prefix}", message, prefixColor,messageColor,tagColor,tagText,iconPath));
             //var lastItem = ChatMessages.Last();
             //ConversationList.ScrollIntoView(lastItem);
         }
@@ -306,52 +328,14 @@ namespace MageWin
             return this.ConversationScrollViewer.VerticalOffset == ConversationScrollViewer.ScrollableHeight;
         }
 
-        public async Task ListenForPlatformsMessages() {           
-            await ListenYoutubeMessages();          
-        }
-        public async Task ListenYoutubeMessages() {
-
-            ///ChannelId
-            _youtube = new Youtube("UCNZCKDhAVtbh7sddChTxI7w");
-            await _youtube.Initialize();
-
-            if (_youtube.IsLive)
+        public async Task InitializeChannel(string channelId,Windows.Networking.Sockets.MessageWebSocket webSocket) {
+            _mageChannel = new MageChannel(channelId, webSocket);
+            await _mageChannel.Initialize();
+            if (_mageChannel.IsLive)
             {
-                _ = Task.Run(async () =>
-                {
-                    while (true)
-                    {
-                        await SendYoutubeMessagesToSocket();
-                        await Task.Delay(TimeSpan.FromSeconds(10));
-                    }
-                });
+                _mageChannel.StartListenPlatformMessages();
             }
-        }
-        public async Task  SendYoutubeMessagesToSocket()
-        {
-            var chatMessages = await _youtube.GetChatMessages(_youtube.GetNextPageToken());
-            if (chatMessages != null) {
-                this.DispatcherQueue.TryEnqueue(async () =>
-                {
-                    foreach (var message in chatMessages)
-                    {
-                        YoutubeMessageData data = new YoutubeMessageData()
-                        {
-                            eventName = "channel-message",
-                            timestamp = message.Snippet.PublishedAt.ToUnixTimestamp(),
-                            user = new Models.YoutubeMessageData.User()
-                            {
-                                username = message.AuthorDetails.DisplayName,
-                                userId = "Youtube"
-                            },
-                            platform = "Youtube"
-                        };
 
-                        var msg = JsonConvert.SerializeObject(data);
-                        await SendMessageUsingMessageWebSocketAsync(msg);
-                    }
-                });
-            }            
-        }
+        }    
     }
 }

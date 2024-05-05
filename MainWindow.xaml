@@ -27,6 +27,7 @@
                 Title="File">
                 <MenuFlyoutItem Click="OpenChannel_Click" Text="Enter Channel ID" />
                 <MenuFlyoutItem Command="{StaticResource LockUnlockWindowCommand}" />
+                <ToggleMenuFlyoutItem IsChecked="True" Command="{Binding Source={StaticResource ShowHidePlatformIconCommand}, Mode=OneTime}" />
                 <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
             </MenuBarItem>
             <MenuBarItem
@@ -50,10 +51,22 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5">
-                                <TextBlock x:Name="TextBlockChat" TextWrapping="Wrap"  Margin="5">
-                                    <Run x:Name="Prefix" Text="{Binding Prefix}" Foreground="{Binding PrefixColor}"/>
-                                    <Run x:Name="Message" Text="{Binding Message}" Foreground="{Binding MessageColor}" />
-                                </TextBlock>
+                                <RichTextBlock Margin="5" TextAlignment="Left" IsTextSelectionEnabled="False">
+                                    <Paragraph >
+                                        <InlineUIContainer >
+                                            <Image Source="{Binding SvgImage}" Width="25" Height="25" Margin="0,0,0,-7" Visibility="{Binding ImageVisibility}" />
+                                        </InlineUIContainer>
+                                       
+                                        <InlineUIContainer >
+                                            <Border BorderThickness="1"   Margin="0,0,0,-7" CornerRadius="2"  Background="{Binding TagColor}" >
+                                                <TextBlock Text="{Binding TagText}" Foreground="White" Padding="4,2,4,2" FontSize="14" />
+                                            </Border>
+                                        </InlineUIContainer>
+                                       
+                                        <Run Text="{Binding Prefix}" Foreground="{Binding PrefixColor}"  />
+                                        <Run Text="{Binding Message}" Foreground="{Binding MessageColor}"  />
+                                    </Paragraph>                                   
+                                </RichTextBlock>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

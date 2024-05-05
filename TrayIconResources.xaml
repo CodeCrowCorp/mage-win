@@ -49,6 +49,12 @@
         </XamlUICommand.KeyboardAccelerators>
     </XamlUICommand>
     <XamlUICommand
+    x:Key="ShowHidePlatformIconCommand"
+    Label="Show Platform Icons"
+    Description="Show/Hide Icons"
+    >
+    </XamlUICommand>
+    <XamlUICommand
         x:Key="GitHubCommand"
         Label="GitHub"
         Description="GitHub"
