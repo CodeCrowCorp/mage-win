@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CommunityToolkit.Common;
-using Google.Apis.Services;
 using MageWin.Enums;
 using MageWin.Interfaces;
 using MageWin.Models;
@@ -201,7 +200,7 @@ namespace MageWin.Entities
         {
             if (userId == _channel.UserId.ToString())
                 return UserRoleType.Host;
-            if (_channel.Mods.Any(modId => modId == userId))
+            if (_channel?.Mods?.Any(modId => modId == userId) == true)
                 return UserRoleType.Moderator;
 
             return UserRoleType.Random;

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Google.Apis.YouTube.v3;
 using H.NotifyIcon;
 using H.NotifyIcon.Core;
 using MageWin.Interfaces;
