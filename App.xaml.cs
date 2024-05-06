@@ -167,7 +167,7 @@ namespace MageWin
             if (_displayPlatformIcons)
             {
 
-                Window.ChatMessages.Where(message => !string.IsNullOrWhiteSpace(message.IconPath)).ToList().ForEach(item =>
+                Window.ChatMessages.Where(message => message.SvgImage != null).ToList().ForEach(item =>
                 {                    
                     item.ImageVisibility = Visibility.Collapsed;
                     item.ReloadMessage(item.Message);
@@ -177,14 +177,14 @@ namespace MageWin
             }
             else
             {
-                Window.ChatMessages.Where(message => !string.IsNullOrWhiteSpace(message.IconPath)).ToList().ForEach(item =>
+                Window.ChatMessages.Where(message => message.SvgImage != null).ToList().ForEach(item =>
                 {                   
                     item.ImageVisibility = Visibility.Visible;
                     item.ReloadMessage(item.Message);
                 });
                 _displayPlatformIcons = true;
             }
-            Window._conversationlist.UpdateLayout();
+            Window._conversationList.UpdateLayout();
         }
 
     }

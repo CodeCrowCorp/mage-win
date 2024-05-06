@@ -155,7 +155,6 @@ namespace MageWin.Helpers
             string iconPath = null,
             Visibility imageVisibility = Visibility.Visible)
         {
-            iconPath = "https://imagedelivery.net/815v_avUAZL5R0XoDZG3pw/5355871f-6a19-4fee-5d92-8940e1bc6600/public";
             Prefix = prefix;
             Message = message;
             PrefixColor = prefixColor;

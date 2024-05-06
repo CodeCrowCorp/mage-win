@@ -36,6 +36,7 @@ namespace MageWin
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        public ListView _conversationList { get; set; }
         public ObservableCollection<Helpers.ChatMessage> ChatMessages { get; } = new ObservableCollection<Helpers.ChatMessage>();
         private Windows.Networking.Sockets.MessageWebSocket webSocket;
         private DispatcherTimer _youtubeTimer;
@@ -48,6 +49,7 @@ namespace MageWin
             GetAppWindowAndPresenter();
             _apw.IsShownInSwitchers = true;
             _presenter.SetBorderAndTitleBar(true, true);
+            _conversationList = ConversationList;
             ConversationList.ItemsSource = ChatMessages;
             this.CenterOnScreen();
 
@@ -163,7 +165,7 @@ namespace MageWin
             {
                 ResponseProgressBar.Visibility = Visibility.Visible;
                 var client = new HttpClient();
-                var res = await client.GetStringAsync("https://api.mage.stream/wsinit/channelid?channelId=" + ChannelText.Text);
+                //var res = await client.GetStringAsync("https://api.mage.stream/wsinit/channelid?channelId=" + ChannelText.Text);
                 SendMessageGrid.Visibility = Visibility.Collapsed;
                 webSocket = new Windows.Networking.Sockets.MessageWebSocket();
                 webSocket.Control.MessageType = Windows.Networking.Sockets.SocketMessageType.Utf8;
@@ -172,7 +174,7 @@ namespace MageWin
                 try
                 {
 
-                    Task connectTask = webSocket.ConnectAsync(new Uri("wss://api.mage.stream/wsinit/channelid/" + res + "/connect")).AsTask();
+                    Task connectTask = webSocket.ConnectAsync(new Uri("wss://api.mage.stream/wsinit/channelid/" + ChannelText.Text + "/connect")).AsTask();
                     var data = new
                     {
                         eventName = "channel-subscribe",
