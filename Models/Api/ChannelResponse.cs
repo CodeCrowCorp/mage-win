@@ -24,7 +24,7 @@ namespace MageWin.Models.Api.ChannelResponse
         public DateTime UpdatedAt { get; set; }
         public int UserId { get; set; }
         public int IsAiChatEnabled { get; set; }
-        public int? DiscordThreadId { get; set; }
+        public string? DiscordThreadId { get; set; }
         public string Avatar { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }

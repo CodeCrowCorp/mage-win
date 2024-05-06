@@ -331,10 +331,11 @@ namespace MageWin
         }
 
         public async Task InitializeChannel(string channelId,Windows.Networking.Sockets.MessageWebSocket webSocket) {
+            _mageChannel?.Dispose();
             _mageChannel = new MageChannel(channelId, webSocket);
             await _mageChannel.Initialize();
             if (_mageChannel.IsLive)
-            {
+            {             
                 _mageChannel.StartListenPlatformMessages();
             }
 

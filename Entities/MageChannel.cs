@@ -58,12 +58,10 @@ namespace MageWin.Entities
             _ = Task.Run(async () =>
             {
                 while (!_cancellationTokenSource.Token.IsCancellationRequested)
-                {
-                   
+                {                  
                         var chatMessages = await this.GetYoutubeChatMessages(this._channel.UserId.ToString(),this.GetNextPageToken());
                         await SendYoutubeMessagesToSocket(chatMessages);
                         await Task.Delay(TimeSpan.FromSeconds(5));
-                    
                     
                 }
             });
@@ -72,6 +70,10 @@ namespace MageWin.Entities
         public void StopListenPlatformMessages()
         {
             _cancellationTokenSource?.Cancel();
+        }
+        public void Dispose() 
+        {
+            StopListenPlatformMessages();
         }
 
         public string GetNextPageToken() {
