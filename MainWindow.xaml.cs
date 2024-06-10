@@ -249,6 +249,7 @@ namespace MageWin
             var color = GetSolidColorBrush("#000000ff").Color;
             MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
             FileMenu.Visibility = Visibility.Collapsed;
+            HelpMenu.Visibility = Visibility.Collapsed;
             _presenter.SetBorderAndTitleBar(false, false);
             _presenter.IsResizable = false;
             MainWindowUI.Show();
@@ -261,6 +262,7 @@ namespace MageWin
         {
             MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.Black };
             FileMenu.Visibility = Visibility.Visible;
+            HelpMenu.Visibility = Visibility.Visible;
             _presenter.SetBorderAndTitleBar(true, true);
             _presenter.IsResizable = true;
             MainWindowUI.SetIsAlwaysOnTop(false);
