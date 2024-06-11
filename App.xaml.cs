@@ -1,5 +1,10 @@
-﻿using H.NotifyIcon;
+﻿using AutoMapper;
+using H.NotifyIcon;
 using H.NotifyIcon.Core;
+using MageWin.Interfaces;
+using MageWin.Models;
+using MageWin.Models.Api.ChannelResponse;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -31,10 +36,13 @@ namespace MageWin
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     public partial class App : Application
-    {    
+    {
+        public bool _displayPlatformIcons = true;
         public bool _lockScreen;
         public TaskbarIcon? TrayIcon { get; private set; }
         public MainWindow? Window { get; set; }
+        public static IServiceProvider ServiceProvider { get; private set; }
+
 
         public bool HandleClosedEvents { get; set; } = true;
 
@@ -53,7 +61,11 @@ namespace MageWin
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            var services = new ServiceCollection();
+            DependencyConfiguration.Configure(services);
+            ServiceProvider = services.BuildServiceProvider();
             InitializeTrayIcon();
+
         }
 
         private void InitializeTrayIcon()
@@ -72,6 +84,9 @@ namespace MageWin
 
             var discordCommand = (XamlUICommand)Resources["DiscordCommand"];
             discordCommand.ExecuteRequested += DiscordCommand_ExecuteRequested;
+
+            var showHidePlatformIconCommand = (XamlUICommand)Resources["ShowHidePlatformIconCommand"];
+            showHidePlatformIconCommand.ExecuteRequested += ShowHidePlatformIconCommand_ExecuteRequested;
 
             TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
             Image img = new Image();
@@ -145,5 +160,31 @@ namespace MageWin
         {
             _ = await Windows.System.Launcher.LaunchUriAsync(new Uri("https://discord.mage.stream"));
         }
+
+        private void ShowHidePlatformIconCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
+        {            
+            if (_displayPlatformIcons)
+            {
+
+                Window.ChatMessages.Where(message => message.SvgImage != null).ToList().ForEach(item =>
+                {                    
+                    item.ImageVisibility = Visibility.Collapsed;
+                    item.ReloadMessage(item.Message);
+                    
+                });
+                _displayPlatformIcons = false;
+            }
+            else
+            {
+                Window.ChatMessages.Where(message => message.SvgImage != null).ToList().ForEach(item =>
+                {                   
+                    item.ImageVisibility = Visibility.Visible;
+                    item.ReloadMessage(item.Message);
+                });
+                _displayPlatformIcons = true;
+            }
+            Window._conversationList.UpdateLayout();
+        }
+
     }
 }
