@@ -28,7 +28,7 @@ namespace MageWin.Models.Api.ChannelResponse
         public string Avatar { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
-        public int PlanTier { get; set; }
+        public int? PlanTier { get; set; }
         public int ViewCount { get; set; }
     }
 }
