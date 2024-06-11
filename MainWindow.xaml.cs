@@ -25,6 +25,9 @@ using MageWin.Models.Socket.MessageDataReceive;
 using WinUIEx.Messaging;
 using ColorCode.Compilation.Languages;
 using System.Configuration;
+using Windows.UI.ViewManagement;
+using Windows.UI;
+using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,6 +45,8 @@ namespace MageWin
         private DispatcherTimer _youtubeTimer;
         private MageChannel _mageChannel;
         public string _channelId { get; set; }
+
+        public Color _backgroundSystemColor { get; set; }
         public MainWindow()
         {
             this.InitializeComponent();
@@ -52,6 +57,8 @@ namespace MageWin
             _conversationList = ConversationList;
             ConversationList.ItemsSource = ChatMessages;
             this.CenterOnScreen();
+            var uiSettings = new UISettings();
+            _backgroundSystemColor = uiSettings.GetColorValue(UIColorType.Background);
 
             Title = "Mage";
         }
@@ -65,15 +72,32 @@ namespace MageWin
             return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
         }
 
-        public SolidColorBrush GetSolidColorBrush(string hex)
+        public SolidColorBrush GetSolidColorBrush(string hex, bool inverseColor = false)
         {
             hex = hex.Replace("#", string.Empty);
             byte a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
             byte r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
             byte g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
             byte b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
-            SolidColorBrush myBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(a, r, g, b));
-            return myBrush;
+
+            if (inverseColor)
+            {
+                Color color = Color.FromArgb(a, r, g, b);
+                Color inverse = InvertColor(color);
+                return new SolidColorBrush(inverse);
+            }
+            else
+            {
+                return new SolidColorBrush(Color.FromArgb(a, r, g, b));
+            }
+        }
+
+        private Color InvertColor(Color color)
+        {
+            return Color.FromArgb(color.A,
+                                  (byte)(255 - color.R),
+                                  (byte)(255 - color.G),
+                                  (byte)(255 - color.B));
         }
         private void WebSocket_Closed(Windows.Networking.Sockets.IWebSocket sender, Windows.Networking.Sockets.WebSocketClosedEventArgs args)
         {
@@ -120,7 +144,7 @@ namespace MageWin
             if (json.user != null && json.user?.userId != null)
             {
                 UserRoleType userRole = _mageChannel.GetUserRoleById(json.user.userId);
-                AddMessageToChat(json.user.username, json.message, GetSolidColorBrush(_mageChannel.GetNameColorByRole(userRole)), GetSolidColorBrush(ConfigurationManager.AppSettings["default-color"]), GetSolidColorBrush(_mageChannel.GetTagColorByRole(userRole)),_mageChannel.GetTagTextByRole(userRole), json.iconUrl);
+                AddMessageToChat(json.user.username, json.message, GetSolidColorBrush(_mageChannel.GetNameColorByRole(userRole)), GetSolidColorBrush(Util.ColorToHex(_backgroundSystemColor),true), GetSolidColorBrush(_mageChannel.GetTagColorByRole(userRole)),_mageChannel.GetTagTextByRole(userRole), json.iconUrl);
             }
         }
 
@@ -274,7 +298,7 @@ namespace MageWin
         }
   
 
-        public void LockScreen() {
+        public void LockScreen() {       
             var color = GetSolidColorBrush("#000000ff").Color;
             MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = color };
             FileMenu.Visibility = Visibility.Collapsed;
@@ -288,7 +312,7 @@ namespace MageWin
 
         public void UnlockScreen() 
         {
-            MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = Colors.Black };
+            MainWindowUI.SystemBackdrop = new WinUIEx.TransparentTintBackdrop() { TintColor = _backgroundSystemColor };
             FileMenu.Visibility = Visibility.Visible;
             _presenter.SetBorderAndTitleBar(true, true);
             _presenter.IsResizable = true;
@@ -307,11 +331,11 @@ namespace MageWin
                 int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
                 SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT);
             }
-            else {
-                this.SetWindowOpacity(255);
+            else {              
                 var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
                 int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
                 SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle & ~WS_EX_TRANSPARENT);
+                this.SetWindowOpacity(255);
             }
         }
 

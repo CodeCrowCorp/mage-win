@@ -104,10 +104,10 @@ namespace MageWin.Entities
         public async Task SendYoutubeMessagesToSocket(List<YoutubeModel> youtubeMessages)
         {
             if (youtubeMessages != null)
-            {                
-                foreach (var message in youtubeMessages)
-                {
-                    Models.Socket.MessageDataRequest data = new Models.Socket.MessageDataRequest()
+            {
+               var messagesToSend = youtubeMessages
+                .Select(message => 
+                    new Models.Socket.MessageDataRequest()
                     {
                         eventName = "channel-message",
                         channelId = _channelId,
@@ -117,29 +117,32 @@ namespace MageWin.Entities
                             platform = "youtube",
                             user = new Models.Socket.User()
                             {
-                                userId = "youtube",
+                                userId = message.User.UserId,
                                 username = message.User.Username
                             },
                             isAiChatEnabled = false
                         }
-                    };
-
-                    var msg = JsonConvert.SerializeObject(data);
-                    await SendMessageUsingMessageWebSocketAsync(msg);
-                }
+                    })
+                .Select(message => JsonConvert.SerializeObject(message))
+                .ToArray();               
+                await SendMessageUsingMessageWebSocketAsync(messagesToSend);
                 
             }
         }
 
-        private async Task SendMessageUsingMessageWebSocketAsync(string message)
+        private async Task SendMessageUsingMessageWebSocketAsync(params string[] messages)
         {
             using (var dataWriter = new DataWriter(_websocket.OutputStream))
             {
-                dataWriter.WriteString(message);
-                await dataWriter.StoreAsync();
+                foreach (var message in messages)
+                {
+                    dataWriter.WriteString(message);
+                    await dataWriter.StoreAsync();
+                }
                 dataWriter.DetachStream();
             }
-            Debug.WriteLine("Sending message using MessageWebSocket: " + message);
+
+            Debug.WriteLine("Sending multiple messages using MessageWebSocket: " + string.Join(", ", messages));
         }
         private void SetMessageHistoryList(List<YoutubeModel> youtubeMessages) 
         {
