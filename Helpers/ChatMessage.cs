@@ -104,6 +104,19 @@ namespace MageWin.Helpers
                 }
             }
         }
+        private Visibility _tagVisibility;
+        public Visibility TagVisibility
+        {
+            get { return _tagVisibility; }
+            set
+            {
+                if (_tagVisibility != value)
+                {
+                    _tagVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         private string _tagText;
         public string TagText
         {
@@ -152,13 +165,15 @@ namespace MageWin.Helpers
             SolidColorBrush tagColor,
             string tagText,
             string iconPath = null,
-            Visibility imageVisibility = Visibility.Visible)
+            Visibility imageVisibility = Visibility.Visible,
+            Visibility tagVisibility = Visibility.Visible)
         {
             Prefix = prefix;
             Message = message;
             PrefixColor = prefixColor;
             MessageColor = messageColor;          
             ImageVisibility = !string.IsNullOrWhiteSpace(iconPath) ? imageVisibility : Visibility.Collapsed;
+            TagVisibility = tagText == "Rando" ? Visibility.Collapsed : Visibility.Visible;
             TagColor = tagColor;
             TagText = tagText;
             SvgImage = GetBitmapImageFromSvgUrl(iconPath);

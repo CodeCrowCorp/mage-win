@@ -56,8 +56,8 @@
                                         <InlineUIContainer >
                                             <Image Source="{Binding SvgImage}" Width="25" Height="25" MaxHeight="25" MaxWidth="25" Margin="1,0,3,-7" Visibility="{Binding ImageVisibility}" />
                                         </InlineUIContainer>
-                                        <InlineUIContainer >
-                                            <Border BorderThickness="1"   Margin="-5,0,0,-6" CornerRadius="2"  Background="{Binding TagColor}" >
+                                        <InlineUIContainer>
+                                            <Border BorderThickness="1" Margin="-5,0,0,-6" CornerRadius="2"  Background="{Binding TagColor}" Visibility="{Binding TagVisibility}">
                                                 <TextBlock Text="{Binding TagText}" Foreground="White" Padding="4,2,4,2" FontSize="14" />
                                             </Border>
                                         </InlineUIContainer>
