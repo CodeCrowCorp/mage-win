@@ -111,7 +111,7 @@ jobs:
           fetch-depth: 0 # Fetches all history for all tags and branches
                 
       - name: Download all MSIX packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
 
       - name: Get Project version from Package.appxmanifest
         id: project-version-latest
